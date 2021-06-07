@@ -1,24 +1,23 @@
 import logo from './logo.svg';
 import './App.css';
+import { transitions, positions, Provider as AlertProvider } from 'react-alert'
+import AlertTemplate from 'react-alert-template-basic'
+
+import Auth from '../src/screens/Auth/Auth';
 
 function App() {
+
+  const options = {
+    position: positions.BOTTOM_CENTER,
+    timeout: 4000,
+    offset: '30px',
+    transition: transitions.FADE
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AlertProvider template={AlertTemplate} {...options}>
+      <Auth />
+    </AlertProvider>
   );
 }
 

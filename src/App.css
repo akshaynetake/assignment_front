@@ -24,6 +24,12 @@
   color: white;
 }
 
+:root {
+  --primary: #FF3383;
+  --white: #fff;
+  --black: #000;
+}
+
 .App-link {
   color: #61dafb;
 }
