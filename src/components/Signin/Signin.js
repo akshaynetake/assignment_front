@@ -6,6 +6,7 @@ import { useAlert } from 'react-alert';
 import TextField from '../TextField/TextField';
 import { PrimaryButton, SecondaryButton } from '../Buttons/Buttons';
 import { userLogin } from '../../api/ApiService';
+import { validateEmail, isEmptyField } from '../../utils/validator';
 
 const Container = styled.div`
    text-align: center;
@@ -19,27 +20,41 @@ const ButtonsContainer = styled.div`
 
 const Signin = (props) => {
     const alert = useAlert();
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     const loginCall = () => {
-        let data = {
-            email: email,
-            password: password
-        }
-        userLogin(data).then(res => {
-            console.log("the login responce is =>", res);
-            if (res.code === 200) {
-                alert.success('Sign up sucessfully!');
-                setPassword('');
-                setEmail('');
-                localStorage.setItem("token", res.token);
-                localStorage.setItem("userid", res.data._id);
-            } else {
+        if (!isEmptyField(email)) {
+            alert.error('Please enter Email!');
+        } else if (!validateEmail(email)) {
+            alert.error("Please Enter Valid Email!")
+        } else if (!isEmptyField(password)) {
+            alert.error("Please Enter Password!")
+        } else {
+            let data = {
+                email: email,
+                password: password
             }
-        }).catch(err => {
-            console.log("err ==>", err);
-        })
+            userLogin(data).then(res => {
+                console.log("res=>", res)
+                if (res.code === 200) {
+                    alert.success('Sign up sucessfully!');
+                    setPassword('');
+                    setEmail('');
+                    localStorage.setItem("token", res.token);
+                    localStorage.setItem("userid", res.data._id);
+                } else {
+                    if (res.msg === "USE_NOT_FOUND") {
+                        alert.error('User Not Found!');
+                    }else{
+                        alert.error('Wrong Email Password!');
+                    }
+                }
+            }).catch(err => {
+                alert.error('Something Went Wrong!');
+                console.log("err ==>", err);
+            })
+        }
     }
 
     const handleLogin = () => {

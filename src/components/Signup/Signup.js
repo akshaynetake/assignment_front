@@ -6,6 +6,7 @@ import { useAlert } from 'react-alert';
 import TextField from '../TextField/TextField';
 import { PrimaryButton, SecondaryButton } from '../Buttons/Buttons';
 import { userRegister } from '../../api/ApiService';
+import { validateEmail, isEmptyField } from '../../utils/validator';
 
 const Container = styled.div`
    text-align: center;
@@ -31,28 +32,45 @@ const Signup = (props) => {
     const alert = useAlert();
     const [showPass, SetShowPass] = useState(false);
     const [showPassText, setShowPassText] = useState('Show');
-    const [name, setName] = useState();
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     const registerCall = () => {
-        let data = {
-            name:name,
-            email: email,
-            password: password
-        }
-        userRegister(data).then(res => {
-            console.log("the login responce is", res);
-            if (res.code === 200) {
-                alert.success('Sign up sucessfully!');
-                setName('');
-                setPassword('');
-                setEmail('');
-            } else {
+        if (!isEmptyField(name)) {
+            alert.error('Please enter Name!');
+        } else if (!isEmptyField(email)) {
+            alert.error('Please enter Email!');
+        } else if (!validateEmail(email)) {
+            alert.error("Please Enter Valid Email!")
+        } else if (!isEmptyField(password)) {
+            alert.error("Please Enter Password!")
+        } else {
+            let data = {
+                name: name,
+                email: email,
+                password: password
             }
-        }).catch(err => {
-            console.log("err ==>", err);
-        })
+            userRegister(data).then(res => {
+                if (res.code === 200) {
+                    alert.success('Sign up sucessfully!');
+                    setName('');
+                    setPassword('');
+                    setEmail('');
+                    handleSignin();
+                } else {
+                    console.log(res)
+                    if (res.msg === "EMAIL_EXISTS") {
+                        alert.error('User Already Exists!');
+                    }else{
+                        alert.error('Something Went Wrong!');
+                    }
+                }
+            }).catch(err => {
+                console.log("err ==>", err);
+                alert.error('Something Went Wrong!');
+            })
+        }
     }
 
     const handlePasswordShow = () => {
